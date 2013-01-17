@@ -1,0 +1,46 @@
+bundle agent config_ssh
+{
+  vars:
+      # SSHD configuration to set
+      "sshd[Protocol]"				   string => "2";
+      "sshd[X11Forwarding]"			   string => "yes";
+      "sshd[UseDNS]"				   string => "no";
+      "sshd[UsePam]"				   string => "no";
+      "sshd[PermitRootLogin]"		   string => "no";
+	  "sshd[PermitEmptyPasswords]"     string => "no";
+	  "sshd[AllowGroups]"			   string => $(manage_users.ssh_group);
+	  "sshd[PasswordAuthentication]"   string => "no";
+      "sshd[ClientAliveInterval]"      string => "300";
+      "sshd[ClientAliveCountMax]"      string => "0";
+      "sshd[IgnoreRhosts]"             string => "yes";
+      "sshd[HostbasedAuthentication]"  string => "no";
+
+
+  methods:
+	  "sshd" usebundle		=> edit_sshd,
+	  comment				=> "Configure sshd";
+}
+
+bundle agent edit_sshd
+{
+  files:
+      "/etc/ssh/sshd_config"
+        handle    => "sshd_config",
+        comment   => "Set sshd configuration",
+        edit_line => set_config_values("config_ssh.sshd"),
+        classes   => if_repaired("restart_sshd");
+
+	  "/home/gsd/.ssh/authorized_keys"
+       handle     => "authorized_keys",
+	   comment    => "Set gsd authorized_keys",
+       perms      => mog("640", "gsd", "users"),
+       copy_from  => secure_cp("/var/cfengine/masterfiles/templates/gsd_authorized_keys", "localhost"),
+       create     => "true";
+ 
+
+  commands:
+    restart_sshd::
+      "/usr/sbin/service ssh restart"
+        handle  => "sshd_restart",
+        comment => "Restart sshd if the configuration file was modified";
+}

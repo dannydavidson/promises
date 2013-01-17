@@ -1,0 +1,34 @@
+bundle agent config_iptables
+{
+  vars:
+      # iptables rules files to set 
+      "ipv4_src"				   string => "var/cfengine/masterfiles/templates/rules.v4";
+      "ipv6_src"                   string => "var/cfengine/masterfiles/templates/rules.v6";
+
+  methods:
+	  "iptables" usebundle		=> edit_iptables,
+	  comment				    => "Configure iptables";
+}
+
+bundle agent edit_iptables
+{
+  files:
+      "/etc/iptables/rules.v4"
+        handle    => "edit_iptables_v4",
+        comment   => "Set ipv4 iptable rules",
+	    copy_from => secure_cp("/var/cfengine/masterfiles/templates/rules.v4", "localhost"),
+        classes   => if_repaired("reload_iptables");
+
+	  "/etc/iptables/rules.v6"                                                                   
+        handle    => "edit_iptables_v6",
+        comment   => "Set ipv6 iptable rules",
+        copy_from => secure_cp("/var/cfengine/masterfiles/templates/rules.v6", "localhost"),
+        classes   => if_repaired("reload_iptables");
+
+  commands:
+    
+   reload_iptables::
+      "/usr/sbin/service iptables-persistent start"
+        handle  => "reload_iptables",
+        comment => "use iptables-persistent to restart";
+}

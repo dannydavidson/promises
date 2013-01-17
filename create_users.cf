@@ -1,0 +1,41 @@
+bundle agent create_users(user, group)
+{
+vars:
+  "user_index"        slist => getindices("$(user)");
+  "group_index"		  slist => getindices("$(group)");
+
+classes:
+  "add_user_$(user_index)" not => userexists("$(user_index)");
+  "add_group_$(group_index)" not => groupexists("$(group_index)");
+
+commands:
+  linux::
+	   "/usr/sbin/useradd $($(user)[$(user_index)][flags]) -u $($(user)[$(user_index)][uid]) \
+		-g $($(user)[$(user_index)][gid]) -d $($(user)[$(user_index)][home]) \
+		-s $($(user)[$(user_index)][shell]) $(user_index)"
+		 ifvarclass => "add_user_$(user_index)";
+
+	   "/usr/sbin/groupadd $(group_index)"
+	     ifvarclass => "add_group_$(group_index)";
+   
+   verbose::
+	  "Created group $(group_index)"
+		 ifvarclass => "add_group_$(group_index)";	  
+
+files:
+  # This is not conditioned to the add_* classes to always check
+  # and reset the passwords if needed.
+  linux::
+    "/etc/shadow"
+      edit_line => set_user_field("$(user_index)", 2, "$($(user)[$(user_index)][password])");
+   
+    "/etc/group"
+	  edit_line => set_user_field("$(group_index)", 4, "$($(group)[$(group_index)][users])");
+
+reports:
+  !linux::
+    "I only know how to create users under Linux";
+  verbose::
+    "Created user $(user_index)"
+      ifvarclass => "add_user_$(index)";
+}

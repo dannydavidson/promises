@@ -1,0 +1,45 @@
+bundle agent config_vsftpd
+{
+  vars:
+      # SSHD configuration to set
+      "vsftpd[anonymous_enable]"		string => "NO";
+      "vsftpd[local_enable]"            string => "YES";
+      "vsftpd[write_enable]"            string => "YES";
+      "vsftpd[connect_from_port_20]"    string => "NO";
+      "vsftpd[chroot_local_user]"       string => "YES";
+      "vsftpd[local_umask]"             string => "022";
+      "vsftpd[userlist_enable]"         string => "NO";
+      "vsftpd[userlist_deny]"           string => "NO";
+      "vsftpd[userlist_file]"           string => "/etc/vsftpd.userlist";
+	  "vsftpd[xferlog_enable]"          string => "YES";
+      "vsftpd[listen]"					string => "YES";
+
+	  "userlist"                slist => {"jim", "gsd"};
+
+  methods:
+	  "sshd" usebundle		=> edit_vsftpd,
+	  comment				=> "Configure vsftpd";
+}
+
+bundle agent edit_vsftpd
+{
+  files:
+      "/etc/vsftpd.conf"
+        handle    => "vsftpd_config",
+        comment   => "Set vsftpd configuration",
+        edit_line => set_variable_values("config_vsftpd.vsftpd"),
+        classes   => if_repaired("restart_vsftpd");
+
+      "$(config_vsftpd.vsftpd[userlist_file])"
+	    handle    => "vsftpd_userlist",
+        comment   => "Set vsftpd userlist",
+        create    =>  "true",
+        edit_line =>  append_if_no_line(@(config_vsftpd.userlist)),
+        classes   =>  if_repaired("restart_vsftpd");
+
+  commands:
+    restart_vsftpd::
+      "/usr/sbin/service vsftpd restart"
+        handle  => "vsftpd_restart",
+        comment => "Restart vsftpd if the configuration file was modified";
+}

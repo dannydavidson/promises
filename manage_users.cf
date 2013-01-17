@@ -1,0 +1,40 @@
+bundle agent manage_users
+{
+vars:
+  # Users to manage
+  "users[root][gecos]"     string => "System administrator";
+  "users[root][uid]"       string => "0";
+  "users[root][gid]"       string => "0";
+  "users[root][home]"      string => "/root";
+  "users[root][shell]"     string => "/bin/bash";
+  "users[root][flags]"     string => "-o -m";
+  "users[root][password]"  string => "$1$r93dvmO6$duln4i2sPirV0PHu.r8vm/";
+
+  "users[gsd][gecos]"     string => "gsd";
+  "users[gsd][uid]"       string => "501";
+  "users[gsd][gid]"       string => "users";
+  "users[gsd][home]"      string => "/home/gsd";
+  "users[gsd][shell]"     string => "/bin/bash";
+  "users[gsd][flags]"     string => "-m";
+  "users[gsd][password]"  string => "$1$r93dvmO6$duln4i2sPirV0PHu.r8vm/";
+
+  "users[jim][gecos]"     string => "jim";
+  "users[jim][uid]"       string => "502";
+  "users[jim][gid]"       string => "users";
+  "users[jim][home]"      string => "/mnt/gsd-storage/jim";
+  "users[jim][shell]"	  string => "/usr/sbin/nologin";
+  "users[jim][flags]"     string => "-m";
+  "users[jim][password]"  string => "$1$r93dvmO6$duln4i2sPirV0PHu.r8vm/";
+
+  # Groups to manage, with list of users to add to group
+  "groups[sudo][users]"   string => "gsd";
+  "groups[ssh][users]"    string => "gsd";
+  "groups[users][users]"  string => "gsd";
+  "groups[ftp][users]"    string => "gsd,jim";
+
+  # the group used for ssh access
+  "ssh_group"             string => "ssh";
+
+methods:
+  "users"   usebundle => create_users("manage_users.users", "manage_users.groups");
+}
