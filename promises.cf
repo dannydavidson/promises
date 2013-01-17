@@ -1,12 +1,11 @@
 body common control  
 {
-    bundlesequence => { "manage_users", "config_ssh", "config_iptables", "config_vsftpd" };
+    bundlesequence => { "manage_users", "config_ssh", "config_iptables" };
     inputs => {
 	    "cfengine_stdlib.cf",
 	    "manage_users.cf",
         "create_users.cf",
 	    "config_ssh.cf",
 	    "config_iptables.cf",
-        "config_vsftpd.cf"
     };
 }

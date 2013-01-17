@@ -18,6 +18,8 @@
 -A INPUT -p udp --dport ftp-data -i eth0 -j ACCEPT
 -A INPUT -p tcp --dport http -i eth0 -j ACCEPT
 -A INPUT -p tcp --dport https -i etho0 -j ACCEPT
+-A INPUT -p tcp --dport cfengine -i eth0 -j ACCEPT
+
 
 # Allow local loopback services
 

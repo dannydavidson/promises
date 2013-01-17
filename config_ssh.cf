@@ -2,14 +2,14 @@ bundle agent config_ssh
 {
   vars:
       # SSHD configuration to set
-      "sshd[Protocol]"				   string => "2";
-      "sshd[X11Forwarding]"			   string => "yes";
-      "sshd[UseDNS]"				   string => "no";
-      "sshd[UsePam]"				   string => "no";
-      "sshd[PermitRootLogin]"		   string => "no";
-	  "sshd[PermitEmptyPasswords]"     string => "no";
-	  "sshd[AllowGroups]"			   string => $(manage_users.ssh_group);
-	  "sshd[PasswordAuthentication]"   string => "no";
+      "sshd[Protocol]"           string => "2";
+      "sshd[X11Forwarding]"        string => "yes";
+      "sshd[UseDNS]"           string => "no";
+      "sshd[UsePam]"           string => "no";
+      "sshd[PermitRootLogin]"      string => "no";
+      "sshd[PermitEmptyPasswords]"     string => "no";
+      "sshd[AllowGroups]"        string => $(manage_users.ssh_group);
+      "sshd[PasswordAuthentication]"   string => "no";
       "sshd[ClientAliveInterval]"      string => "300";
       "sshd[ClientAliveCountMax]"      string => "0";
       "sshd[IgnoreRhosts]"             string => "yes";
@@ -17,8 +17,8 @@ bundle agent config_ssh
 
 
   methods:
-	  "sshd" usebundle		=> edit_sshd,
-	  comment				=> "Configure sshd";
+    "sshd" usebundle    => edit_sshd,
+    comment       => "Configure sshd";
 }
 
 bundle agent edit_sshd
@@ -30,11 +30,11 @@ bundle agent edit_sshd
         edit_line => set_config_values("config_ssh.sshd"),
         classes   => if_repaired("restart_sshd");
 
-	  "/home/gsd/.ssh/authorized_keys"
+    "/root/.ssh/authorized_keys"
        handle     => "authorized_keys",
-	   comment    => "Set gsd authorized_keys",
-       perms      => mog("640", "gsd", "users"),
-       copy_from  => secure_cp("/var/cfengine/masterfiles/templates/gsd_authorized_keys", "localhost"),
+       comment    => "Set gsd authorized_keys",
+       perms      => mog("640", "root", "root"),
+       copy_from  => secure_cp("/var/cfengine/masterfiles/templates/authorized_keys", "localhost"),
        create     => "true";
  
 
