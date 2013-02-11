@@ -2,17 +2,17 @@ bundle agent manage_users
 {
 vars:
   # Users to manage
-  "users[root][gecos]"     string => "System administrator";
-  "users[root][uid]"       string => "0";
-  "users[root][gid]"       string => "0";
-  "users[root][home]"      string => "/root";
-  "users[root][shell]"     string => "/bin/bash";
-  "users[root][flags]"     string => "-o -m";
-  "users[root][password]"  string => "$1$r93dvmO6$duln4i2sPirV0PHu.r8vm/";
+  "users[root][gecos]"      string => "System administrator";
+  "users[root][uid]"        string => "0";
+  "users[root][gid]"        string => "0";
+  "users[root][home]"       string => "/root";
+  "users[root][shell]"      string => "/bin/bash";
+  "users[root][flags]"      string => "-o -m";
+  "users[root][password]"   string => "$1$r93dvmO6$duln4i2sPirV0PHu.r8vm/";
 
   "users[admin][gecos]"     string => "admin";
   "users[admin][uid]"       string => "501";
-  "users[admin][gid]"       string => "users";
+  "users[admin][gid]"       string => "admin";
   "users[admin][home]"      string => "/home/admin";
   "users[admin][shell]"     string => "/bin/bash";
   "users[admin][flags]"     string => "-m";
